@@ -3,6 +3,7 @@ use actix_files::{Files, NamedFile};
 use actix_multipart::Multipart;
 use actix_web::{get, post, web, App, HttpServer, Result};
 use futures::stream::StreamExt;
+use nalgebra::{Matrix3, Quaternion, Rotation3, UnitQuaternion};
 use std::fmt::Write;
 use std::time;
 
@@ -60,32 +61,58 @@ async fn form(mut form: Multipart) -> String {
     output
 }
 
+//#[post("matrix")]
+//async fn matrix_form(mut matrix: Multipart) -> String {
+//    let mut name_text_pairs: Vec<(String, String)> = Vec::new();
+//    while let Some(Ok(mut field)) = matrix.next().await {
+//        let field_name = field
+//            .content_disposition()
+//            .and_then(|cd| cd.get_name().map(ToString::to_string))
+//            .expect("Can't get field name!");
+//
+//        let mut field_bytes: Vec<u8> = Vec::new();
+//        while let Some(Ok(bytes)) = field.next().await {
+//            for byte in bytes {
+//                field_bytes.push(byte)
+//            }
+//        }
+//
+//        let field_text = String::from_utf8_lossy(&field_bytes).into_owned();
+//        name_text_pairs.push((field_name, field_text));
+//    }
+//
+//    let mut output = String::new();
+//    for (name, text) in name_text_pairs {
+//        writeln!(&mut output, "{}: {}", name, text).unwrap();
+//        writeln!(&mut output, "___________________").unwrap();
+//    }
+//    output
+//}
+
 #[post("matrix")]
-async fn matrix_form(mut matrix: Multipart) -> String {
-    let mut name_text_pairs: Vec<(String, String)> = Vec::new();
-    while let Some(Ok(mut field)) = matrix.next().await {
-        let field_name = field
-            .content_disposition()
-            .and_then(|cd| cd.get_name().map(ToString::to_string))
-            .expect("Can't get field name!");
-
-        let mut field_bytes: Vec<u8> = Vec::new();
-        while let Some(Ok(bytes)) = field.next().await {
-            for byte in bytes {
-                field_bytes.push(byte)
-            }
-        }
-
-        let field_text = String::from_utf8_lossy(&field_bytes).into_owned();
-        name_text_pairs.push((field_name, field_text));
-    }
-
-    let mut output = String::new();
-    for (name, text) in name_text_pairs {
-        writeln!(&mut output, "{}: {}", name, text).unwrap();
-        writeln!(&mut output, "___________________").unwrap();
-    }
-    output
+async fn matrix(
+    request_data: web::Json<shared::RotationMatrix>,
+) -> Result<web::Json<shared::Quaternion>> {
+    let flat_mat = &request_data.values;
+    let m = Matrix3::new(
+        flat_mat[0],
+        flat_mat[1],
+        flat_mat[2],
+        flat_mat[3],
+        flat_mat[4],
+        flat_mat[5],
+        flat_mat[6],
+        flat_mat[7],
+        flat_mat[8],
+    );
+    let rot_matrix = Rotation3::from_matrix(&m);
+    let q = UnitQuaternion::from_rotation_matrix(&rot_matrix);
+    Ok(web::Json(shared::Quaternion {
+        x: q[0],
+        y: q[1],
+        z: q[2],
+        w: q[3],
+    }))
 }
 
 async fn index() -> Result<NamedFile> {
@@ -109,7 +136,7 @@ async fn main() -> std::io::Result<()> {
                     .service(send_message)
                     .service(delayed_response)
                     .service(form)
-                    .service(matrix_form)
+                    .service(matrix)
                     .default_service(web::route().to(web::HttpResponse::NotFound)),
             )
             .service(Files::new("/pkg", "./client/pkg"))
