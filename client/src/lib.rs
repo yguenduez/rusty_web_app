@@ -7,6 +7,7 @@ mod example_b;
 mod example_c;
 mod example_d;
 mod example_e;
+mod matrix_form;
 
 // ------ ------
 //     Init
@@ -27,6 +28,7 @@ struct Model {
     example_c: example_c::Model,
     example_d: example_d::Model,
     example_e: example_e::Model,
+    matrix_form: matrix_form::Model,
 }
 
 // ------ ------
@@ -39,6 +41,7 @@ enum Msg {
     ExampleC(example_c::Msg),
     ExampleD(example_d::Msg),
     ExampleE(example_e::Msg),
+    Matrix(matrix_form::Msg),
 }
 
 fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
@@ -57,6 +60,9 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         }
         Msg::ExampleE(msg) => {
             example_e::update(msg, &mut model.example_e, &mut orders.proxy(Msg::ExampleE));
+        }
+        Msg::Matrix(msg) => {
+            matrix_form::update(msg, &mut model.matrix_form, &mut orders.proxy(Msg::Matrix));
         }
     }
 }
@@ -77,6 +83,7 @@ fn view(model: &Model) -> impl IntoNodes<Msg> {
         example_c::view(&model.example_c, view_intro).map_msg(Msg::ExampleC),
         example_d::view(&model.example_d, view_intro).map_msg(Msg::ExampleD),
         example_e::view(&model.example_e, view_intro).map_msg(Msg::ExampleE),
+        matrix_form::view(&model.matrix_form, view_intro).map_msg(Msg::Matrix),
     ]
 }
 

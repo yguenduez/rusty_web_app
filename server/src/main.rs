@@ -60,6 +60,34 @@ async fn form(mut form: Multipart) -> String {
     output
 }
 
+#[post("matrix")]
+async fn matrix_form(mut matrix: Multipart) -> String {
+    let mut name_text_pairs: Vec<(String, String)> = Vec::new();
+    while let Some(Ok(mut field)) = matrix.next().await {
+        let field_name = field
+            .content_disposition()
+            .and_then(|cd| cd.get_name().map(ToString::to_string))
+            .expect("Can't get field name!");
+
+        let mut field_bytes: Vec<u8> = Vec::new();
+        while let Some(Ok(bytes)) = field.next().await {
+            for byte in bytes {
+                field_bytes.push(byte)
+            }
+        }
+
+        let field_text = String::from_utf8_lossy(&field_bytes).into_owned();
+        name_text_pairs.push((field_name, field_text));
+    }
+
+    let mut output = String::new();
+    for (name, text) in name_text_pairs {
+        writeln!(&mut output, "{}: {}", name, text).unwrap();
+        writeln!(&mut output, "___________________").unwrap();
+    }
+    output
+}
+
 async fn index() -> Result<NamedFile> {
     Ok(NamedFile::open("./client/index.html")?)
 }
@@ -81,6 +109,7 @@ async fn main() -> std::io::Result<()> {
                     .service(send_message)
                     .service(delayed_response)
                     .service(form)
+                    .service(matrix_form)
                     .default_service(web::route().to(web::HttpResponse::NotFound)),
             )
             .service(Files::new("/pkg", "./client/pkg"))
