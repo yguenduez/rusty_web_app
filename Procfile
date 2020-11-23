@@ -1,1 +1,1 @@
-web: ./target/release/server
+web: cargo make start_release
