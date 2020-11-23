@@ -3,7 +3,7 @@ use actix_files::{Files, NamedFile};
 use actix_multipart::Multipart;
 use actix_web::{get, post, web, App, HttpServer, Result};
 use futures::stream::StreamExt;
-use nalgebra::{Matrix3, Quaternion, Rotation3, UnitQuaternion};
+use nalgebra::{Matrix3, Rotation3, UnitQuaternion};
 use std::fmt::Write;
 use std::time;
 
@@ -60,34 +60,6 @@ async fn form(mut form: Multipart) -> String {
     }
     output
 }
-
-//#[post("matrix")]
-//async fn matrix_form(mut matrix: Multipart) -> String {
-//    let mut name_text_pairs: Vec<(String, String)> = Vec::new();
-//    while let Some(Ok(mut field)) = matrix.next().await {
-//        let field_name = field
-//            .content_disposition()
-//            .and_then(|cd| cd.get_name().map(ToString::to_string))
-//            .expect("Can't get field name!");
-//
-//        let mut field_bytes: Vec<u8> = Vec::new();
-//        while let Some(Ok(bytes)) = field.next().await {
-//            for byte in bytes {
-//                field_bytes.push(byte)
-//            }
-//        }
-//
-//        let field_text = String::from_utf8_lossy(&field_bytes).into_owned();
-//        name_text_pairs.push((field_name, field_text));
-//    }
-//
-//    let mut output = String::new();
-//    for (name, text) in name_text_pairs {
-//        writeln!(&mut output, "{}: {}", name, text).unwrap();
-//        writeln!(&mut output, "___________________").unwrap();
-//    }
-//    output
-//}
 
 #[post("matrix")]
 async fn matrix(

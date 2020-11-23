@@ -136,7 +136,7 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             log!("Rotation Matrix emitted. Awaiting Quaternion.");
         }
         Msg::Fetched(Ok(response_data)) => {
-            *model = Model::ReadyToSubmit(Form::default());
+            *model = Model::ReadyToSubmit(mem::take(model.form_mut()));
             let q = response_data.clone();
             model.form_mut().response_data = Some(response_data);
             log!("Got Quaternion: x:{}, y:{}, z:{}, w:{}", q.x, q.y, q.z, q.w);
@@ -173,24 +173,18 @@ fn view_from_table(model: &Model) -> Node<Msg> {
                 input_ev(Ev::Input, Msg::MatrixChanged0),
                 attrs! {
                     At::Id => "mat_value_0",
-                    At::Value => format!("{}",model.form().values[0]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
             th!(input![
                 input_ev(Ev::Input, Msg::MatrixChanged1),
                 attrs! {
                     At::Id => "mat_value_1",
-                    At::Value => format!("{}",model.form().values[1]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
             th!(input![
                 input_ev(Ev::Input, Msg::MatrixChanged2),
                 attrs! {
                     At::Id => "mat_value_2",
-                    At::Value => format!("{}",model.form().values[2]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
         ),
@@ -199,24 +193,18 @@ fn view_from_table(model: &Model) -> Node<Msg> {
                 input_ev(Ev::Input, Msg::MatrixChanged3),
                 attrs! {
                     At::Id => "mat_value_3",
-                    At::Value => format!("{}",model.form().values[3]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
             th!(input![
                 input_ev(Ev::Input, Msg::MatrixChanged4),
                 attrs! {
                     At::Id => "mat_value_4",
-                    At::Value => format!("{}",model.form().values[4]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
             th!(input![
                 input_ev(Ev::Input, Msg::MatrixChanged5),
                 attrs! {
                     At::Id => "mat_value_5",
-                    At::Value => format!("{}",model.form().values[5]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
         ),
@@ -225,24 +213,18 @@ fn view_from_table(model: &Model) -> Node<Msg> {
                 input_ev(Ev::Input, Msg::MatrixChanged6),
                 attrs! {
                     At::Id => "mat_value_6",
-                    At::Value => format!("{}",model.form().values[6]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
             th!(input![
                 input_ev(Ev::Input, Msg::MatrixChanged7),
                 attrs! {
                     At::Id => "mat_value_7",
-                    At::Value => format!("{}",model.form().values[7]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
             th!(input![
                 input_ev(Ev::Input, Msg::MatrixChanged8),
                 attrs! {
                     At::Id => "mat_value_8",
-                    At::Value => format!("{}",model.form().values[8]),
-                    At::Required => true.as_at_value(),
                 }
             ]),
         ),
