@@ -1,1 +1,1 @@
-web: ./target/release/server
+web: PKG_FOLDER=./client/pkg ./target/release/server

@@ -103,6 +103,13 @@ fn get_server_port() -> u16 {
         .unwrap_or(8080)
 }
 
+fn get_pkg_folder() -> String {
+    env::var("PKG_FOLDER")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or("./client/pkg".into())
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let count_actor_addr = CountActor(0).start();
@@ -119,7 +126,7 @@ async fn main() -> std::io::Result<()> {
                     .service(matrix)
                     .default_service(web::route().to(web::HttpResponse::NotFound)),
             )
-            .service(Files::new("/pkg", "./client/pkg"))
+            .service(Files::new("/pkg", get_pkg_folder()))
             .default_service(web::get().to(index))
     })
     .bind(format!("0.0.0.0:{}", get_server_port()))?
