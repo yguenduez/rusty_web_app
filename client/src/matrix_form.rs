@@ -237,7 +237,7 @@ fn view_quaternion(quat: &Option<shared::Quaternion>) -> Node<Msg> {
         None => return empty![],
     };
     div![format!(
-        "quat: x: {}, y: {}, z: {}, w: {}",
+        "quat: x: {:.2}, y: {:.2}, z: {:.2}, w: {:.2}",
         quat.x, quat.y, quat.z, quat.w
     )]
 }
