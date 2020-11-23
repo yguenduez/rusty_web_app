@@ -4,6 +4,7 @@ use actix_multipart::Multipart;
 use actix_web::{get, post, web, App, HttpServer, Result};
 use futures::stream::StreamExt;
 use nalgebra::{Matrix3, Rotation3, UnitQuaternion};
+use std::env;
 use std::fmt::Write;
 use std::time;
 
@@ -95,6 +96,13 @@ struct State {
     count_actor: Addr<CountActor>,
 }
 
+fn get_server_port() -> u16 {
+    env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(8080)
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let count_actor_addr = CountActor(0).start();
@@ -114,7 +122,7 @@ async fn main() -> std::io::Result<()> {
             .service(Files::new("/pkg", "./client/pkg"))
             .default_service(web::get().to(index))
     })
-    .bind("127.0.0.1:8080")?
+    .bind(format!("0.0.0.0:{}", get_server_port()))?
     .run()
     .await
 }
