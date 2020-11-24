@@ -1,1 +1,1 @@
-web: PKG_FOLDER=./client/pkg ./target/release/server
+web: INDEX=./client/index.html PKG_FOLDER=./client/pkg ./target/release/server

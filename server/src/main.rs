@@ -89,7 +89,7 @@ async fn matrix(
 }
 
 async fn index() -> Result<NamedFile> {
-    Ok(NamedFile::open("./client/index.html")?)
+    Ok(NamedFile::open(get_index_file())?)
 }
 
 struct State {
@@ -100,7 +100,7 @@ fn get_server_port() -> u16 {
     env::var("PORT")
         .ok()
         .and_then(|p| p.parse().ok())
-        .unwrap_or(8080)
+        .unwrap_or(3333)
 }
 
 fn get_pkg_folder() -> String {
@@ -110,14 +110,17 @@ fn get_pkg_folder() -> String {
         .unwrap_or("./client/pkg".into())
 }
 
+fn get_index_file() -> String {
+    env::var("INDEX")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or("./client/index.html".into())
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let count_actor_addr = CountActor(0).start();
     HttpServer::new(move || {
         App::new()
-            .data(State {
-                count_actor: count_actor_addr.clone(),
-            })
             .service(
                 web::scope("/api/")
                     .service(send_message)
